@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'auth_store.dart';
-import 'home_page.dart';
-import 'main.dart';
+import '../../data/stores/auth_store.dart';
+import '../pages/user/user_home_page.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import 'register.dart';
 
 class LoginPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final user = AuthStore.signIn(email: _email.text, password: _password.text);
     if (user == null) {
@@ -37,9 +38,11 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
+    await AuthStore.setCurrentUser(user);
+    if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => HomePage(user: user)),
+      MaterialPageRoute(builder: (_) => UserHomePage(user: user)),
       (_) => false,
     );
   }
@@ -57,18 +60,18 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.mood, color: C.primary, size: 64),
+                  const Icon(Icons.mood, color: AppColors.primary, size: 64),
                   const SizedBox(height: 16),
                   Text(
                     'Selamat datang kembali',
                     textAlign: TextAlign.center,
-                    style: headline(),
+                    style: AppText.headlineXlMobile(),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Masuk untuk melihat ringkasan suasana hatimu.',
                     textAlign: TextAlign.center,
-                    style: bodyMd(C.onSurfaceVariant),
+                    style: AppText.bodyMd(AppColors.onSurfaceVariant),
                   ),
                   const SizedBox(height: 24),
                   if (_error != null) ...[
